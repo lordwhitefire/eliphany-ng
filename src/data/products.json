@@ -1,0 +1,30 @@
+[
+  {
+    "id": "product-001",
+    "type": "https://lordwhitefire.github.io/eliphany/pages/products/Skin-Care-Supplement.html",
+    "type_text": "Skin Care Supplement",
+    "category_1_link": "https://lordwhitefire.github.io/eliphany/pages/products/Skin-Care-Supplements.html",
+    "category_1_text": "Skin Care Supplements",
+    "category_2_link": "https://lordwhitefire.github.io/eliphany/pages/products/Anti-Aging-Products.html",
+    "category_2_text": "Anti-Aging Products",
+    "tag_1_link": "https://lordwhitefire.github.io/eliphany/pages/products/Collagen-Boost/",
+    "tag_1_text": "Collagen Boost",
+    "tag_2_link": "https://lordwhitefire.github.io/eliphany/pages/products/Youthful-Skin/",
+    "tag_2_text": "Youthful Skin",
+    "tag_3_link": "https://lordwhitefire.github.io/eliphany/pages/products/Anti-Wrinkle/",
+    "tag_3_text": "Anti-Wrinkle",
+    "name": "Vita Optimal Age Defying Collagen Supplement",
+    "image": {
+      "dataThumb": "https://lordwhitefire.github.io/assets/epiphany/100/AgeDefying_Collagen-100*100.jpeg",
+      "href": "https://lordwhitefire.github.io/assets/epiphany/600/AgeDefying_Collagen.jpeg",
+      "src": "https://lordwhitefire.github.io/assets/epiphany/600/AgeDefying_Collagen.jpeg",
+      "title": "product-1",
+      "dataSrc": "https://lordwhitefire.github.io/assets/epiphany/600/AgeDefying_Collagen.jpeg",
+      "dataLargeImage": "https://lordwhitefire.github.io/assets/epiphany/600/AgeDefying_Collagen.jpeg",
+      "srcset": "https://lordwhitefire.github.io/assets/epiphany/300/AgeDefying_Collagen-300*300.jpeg 300w, https://lordwhitefire.github.io/assets/epiphany/600/AgeDefying_Collagen.jpeg 600w, https://lordwhitefire.github.io/assets/epiphany/100/AgeDefying_Collagen-100*100.jpeg 100w, https://lordwhitefire.github.io/assets/epiphany/150/AgeDefying_Collagen-150*150.jpeg 150w"
+    },
+    "price": 0.00,
+    "shortDescription": "Age Defying Collagen by Vita Optimal. Reduces visible signs of aging, providing long-lasting anti-aging benefits with sustained release technology. Enhance your skin’s youthfulness.",
+    "description": "Vita Optimal Age Defying Collagen Supplement uses advanced sustained-release technology to reduce visible signs of aging. It supports collagen production, improves skin elasticity, and promotes a youthful, radiant complexion. Made in the USA with premium ingredients for purity and potency."
+  }
+]

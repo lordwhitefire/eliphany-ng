@@ -1,0 +1,44 @@
+---
+import Layout from '../../../components/layouts/Layout.astro';
+import ProductCard from '../../../components/astro/ProductCard.astro';
+import { getUniqueCategories } from '@/utils/getUniqueCategories';
+import { slugify } from '@/utils/slugify';
+import { filterByCategory } from '@/utils/filterByCategory';
+import products from '@/data/products.json';
+
+export async function getStaticPaths() {
+  const cats = await getUniqueCategories();
+  return cats.map(c => ({
+    params: { slug: slugify(c) },
+    props: { categoryName: c }
+  }));
+}
+
+const { slug } = Astro.params;
+const { categoryName } = Astro.props;
+const list = filterByCategory(products, slug);
+
+// SEO
+const title = `${categoryName} | Eliphany`;
+const description = `Shop ${categoryName} supplements – contact us on WhatsApp for instant orders.`;
+---
+
+<Layout {title} {description}>
+  <section class="py-12 px-4 max-w-7xl mx-auto">
+    <nav class="text-sm text-gray-500 mb-4">
+      <a href="/" class="hover:underline">Home</a>
+      <span class="mx-2">/</span>
+      <span class="text-gray-900">{categoryName}</span>
+    </nav>
+
+    <h1 class="text-4xl font-bold text-gray-900 mb-8">{categoryName}</h1>
+
+    {list.length === 0 ? (
+      <p class="text-gray-600">No products in this category yet – check back soon!</p>
+    ) : (
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {list.map(p => <ProductCard product={p} />)}
+      </div>
+    )}
+  </section>
+</Layout>

@@ -1,0 +1,68 @@
+---
+import BaseHead from '../astro/BaseHead.astro';
+import Navbar from '../astro/Navbar.astro';
+import Footer from '../astro/Footer.astro';
+import '/src/styles/global.css';
+
+export interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  product: {
+    id: string;
+    name: string;
+    description: string;
+    image: { src: string };
+    price: number;
+    category_1_text: string;
+  };
+}
+
+const { title, description, image, product } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead {title} {description} {image} />
+
+    <!-- Product JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "sku": product.id,
+      "name": product.name,
+      "description": product.description,
+      "image": new URL(product.image.src, Astro.url),
+      "category": product.category_1_text,
+      "offers": {
+        "@type": "Offer",
+        "price": product.price || 0,
+        "priceCurrency": "AED",
+        "availability": "https://schema.org/InStock",
+        "seller": {
+          "@type": "Organization",
+          "name": "Eliphany"
+        }
+      }
+    })} />
+  </head>
+
+  <body class="min-h-screen flex flex-col bg-gray-50 text-gray-800">
+    <Navbar />
+
+    <main id="main-content" class="flex-1 w-full">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <script>
+      import '../react/ScrollReveal';
+    </script>
+  </body>
+</html>
+
+<style>
+  html { -webkit-tap-highlight-color: transparent; }
+</style>

@@ -1,0 +1,65 @@
+---
+import CategoryPill from './CategoryPill.astro';
+
+/* fetch unique categories once at build time for the menu */
+import { getUniqueCategories } from '@/utils/getUniqueCategories';
+import { slugify } from '@/utils/slugify';
+
+const categories = await getUniqueCategories(); // string[]
+---
+
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur shadow-sm">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Top">
+    <div class="w-full flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2" aria-label="Home">
+        <img src="/logo.svg" alt="Eliphany" class="h-8 w-auto" />
+        <span class="font-bold text-emerald-600 hidden sm:inline">Eliphany</span>
+      </a>
+
+      <!-- Desktop category pills -->
+      <div class="hidden md:flex items-center gap-2">
+        {categories.map(cat => (
+          <CategoryPill category={cat} />
+        ))}
+      </div>
+
+      <!-- Mobile hamburger -->
+      <button
+        id="nav-toggle"
+        class="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100"
+        aria-controls="mobile-menu"
+        aria-expanded="false"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="md:hidden hidden pb-4">
+      <div class="flex flex-col gap-2">
+        {categories.map(cat => (
+          <a
+            href={`/category/${slugify(cat)}`}
+            class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
+          >
+            {cat}
+          </a>
+        ))}
+      </div>
+    </div>
+  </nav>
+</header>
+
+<script>
+  // toggle mobile menu
+  const btn = document.getElementById('nav-toggle') as HTMLButtonElement;
+  const panel = document.getElementById('mobile-menu') as HTMLDivElement;
+  btn?.addEventListener('click', () => {
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!expanded));
+    panel.classList.toggle('hidden');
+  });
+</script>

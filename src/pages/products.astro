@@ -1,0 +1,102 @@
+---
+import Layout from '../components/layouts/Layout.astro';
+import ProductCard from '../components/astro/ProductCard.astro';
+import CategoryPill from '../components/astro/CategoryPill.astro';
+import { getUniqueCategories } from '@/utils/getUniqueCategories';
+import { filterByCategory } from '@/utils/filterByCategory';
+import products from '@/data/products.json';
+
+const categories = await getUniqueCategories();
+
+/* ---------- filtering ---------- */
+const url = new URL(Astro.request.url);
+const activeCat = url.searchParams.get('cat') ?? 'All';
+
+let list = activeCat === 'All' ? products : filterByCategory(products, activeCat);
+
+/* ---------- pagination ---------- */
+const pageSize = 9;
+const rawPage = Number(url.searchParams.get('page')) || 1;
+const currentPage = Math.max(1, Math.min(rawPage, Math.ceil(list.length / pageSize)));
+
+const start = (currentPage - 1) * pageSize;
+const end = start + pageSize;
+const pageProducts = list.slice(start, end);
+
+const totalPages = Math.ceil(list.length / pageSize);
+
+/* ---------- SEO ---------- */
+const title = activeCat === 'All' ? 'All Products | Eliphany' : `${activeCat} | Eliphany`;
+const description = 'Browse skin-care supplements – contact us on WhatsApp for orders.';
+---
+
+<Layout {title} {description}>
+  <section class="py-12 px-4 max-w-7xl mx-auto">
+    <h1 class="text-4xl font-bold text-gray-900 mb-2">{activeCat}</h1>
+    <p class="text-gray-600 mb-6">
+      Showing {start + 1}–{Math.min(end, list.length)} of {list.length} results
+    </p>
+
+    <!-- category filter -->
+    <nav class="flex flex-wrap gap-2 mb-8 sticky top-20 bg-white/80 backdrop-blur z-10 py-3">
+      <a
+        href="/products"
+        class:list={[
+          'px-3 py-1.5 text-sm rounded-full border',
+          activeCat === 'All'
+            ? 'bg-emerald-600 text-white border-emerald-600'
+            : 'bg-white text-gray-700 border-gray-300 hover:border-emerald-400'
+        ]}
+      >
+        All
+      </a>
+      {categories.map(cat => (
+        <CategoryPill
+          category={cat}
+          large={false}
+          href={`/products?cat=${cat}`}
+        />
+      ))}
+    </nav>
+
+    <!-- grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+      {pageProducts.map(p => <ProductCard product={p} />)}
+    </div>
+
+    <!-- pagination -->
+    {totalPages > 1 && (
+      <div class="flex items-center justify-between mt-10 text-sm">
+        <a
+          href={`/products?cat=${activeCat}&page=${currentPage - 1}`}
+          class:list={[
+            'px-4 py-2 rounded-lg border',
+            currentPage === 1
+              ? 'bg-gray-100 text-gray-400 pointer-events-none'
+              : 'bg-white text-gray-700 hover:border-emerald-400'
+          ]}
+          aria-disabled={currentPage === 1}
+        >
+          ← Previous
+        </a>
+
+        <span class="text-gray-600">
+          Page {currentPage} of {totalPages}
+        </span>
+
+        <a
+          href={`/products?cat=${activeCat}&page=${currentPage + 1}`}
+          class:list={[
+            'px-4 py-2 rounded-lg border',
+            currentPage === totalPages
+              ? 'bg-gray-100 text-gray-400 pointer-events-none'
+              : 'bg-white text-gray-700 hover:border-emerald-400'
+          ]}
+          aria-disabled={currentPage === totalPages}
+        >
+          Next →
+        </a>
+      </div>
+    )}
+  </section>
+</Layout>

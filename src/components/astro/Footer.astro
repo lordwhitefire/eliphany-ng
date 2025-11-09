@@ -1,0 +1,67 @@
+---
+import { slugify } from '@/utils/slugify';
+import { getUniqueCategories } from '@/utils/getUniqueCategories';
+
+const year = new Date().getFullYear();
+const categories = await getUniqueCategories();
+---
+
+<footer class="bg-white border-t border-gray-200 mt-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+
+      <!-- Brand -->
+      <div class="col-span-2 md:col-span-1">
+        <a href="/" class="flex items-center gap-2" aria-label="Home">
+          <img src="/logo.svg" alt="Eliphany" class="h-8 w-auto" />
+          <span class="font-bold text-emerald-600">Eliphany</span>
+        </a>
+        <p class="mt-3 text-gray-600">
+          Premium skin-care supplements curated for you – order via WhatsApp.
+        </p>
+      </div>
+
+      <!-- Quick links -->
+      <div>
+        <h3 class="font-semibold text-gray-900 mb-3">Shop</h3>
+        <ul class="space-y-2">
+          {categories.map(cat => (
+            <li>
+              <a href={`/category/${slugify(cat)}`} class="text-gray-600 hover:text-emerald-600">
+                {cat}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Company -->
+      <div>
+        <h3 class="font-semibold text-gray-900 mb-3">Company</h3>
+        <ul class="space-y-2 text-gray-600">
+          <li><a href="/about" class="hover:text-emerald-600">About</a></li>
+          <li><a href="/contact" class="hover:text-emerald-600">Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <h3 class="font-semibold text-gray-900 mb-3">Get in touch</h3>
+        <ul class="space-y-2 text-gray-600">
+          <li>Mon-Sat 9 am-6 pm</li>
+          <li>
+            <a href="https://wa.me/971501234567" class="btn-whatsapp text-xs px-3 py-2">
+              WhatsApp
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- bottom bar -->
+    <div class="mt-10 pt-6 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
+      <p>© {year} Eliphany. All rights reserved.</p>
+      <p class="mt-2 md:mt-0">Made with ❤️ in Dubai.</p>
+    </div>
+  </div>
+</footer>

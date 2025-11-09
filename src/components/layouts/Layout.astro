@@ -1,0 +1,43 @@
+---
+import BaseHead from '../astro/BaseHead.astro';
+import Navbar from '../astro/Navbar.astro';
+import Footer from '../astro/Footer.astro';
+import '/src/styles/global.css';
+
+export interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+}
+
+const { title, description = 'Skin-care supplements curated for you – contact us on WhatsApp.', image = '/social.jpg' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={title} description={description} image={image} />
+  </head>
+
+  <body class="min-h-screen flex flex-col bg-gray-50 text-gray-800">
+    <Navbar />
+
+    <main id="main-content" class="flex-1 w-full">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <!-- React islands hydrate themselves where needed -->
+    <script>
+      import '../react/ScrollReveal';
+    </script>
+  </body>
+</html>
+
+<style>
+  /* tiny tweak to remove Safari tap glow */
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+</style>

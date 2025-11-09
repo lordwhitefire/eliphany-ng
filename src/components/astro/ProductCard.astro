@@ -1,0 +1,63 @@
+---
+import { whatsappMessage } from '@/utils/whatsappMessage';
+
+export interface Props {
+  product: {
+    id: string;
+    name: string;
+    shortDescription?: string;
+    image: { dataThumb: string };
+    category_1_text?: string;
+  };
+}
+
+const { product } = Astro.props;
+---
+
+<article class="card group relative flex flex-col overflow-hidden">
+  <!-- image -->
+  <div class="aspect-square overflow-hidden bg-gray-100">
+    <img
+      src={product.image.href}
+      alt={product.name}
+      loading="lazy"
+      class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+    />
+  </div>
+
+  <!-- body -->
+  <div class="p-4 flex flex-col gap-2 flex-1">
+    <div class="flex items-start justify-between gap-2">
+      <h3 class="font-semibold text-gray-900 line-clamp-2">{product.name}</h3>
+      {product.category_1_text && (
+        <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full whitespace-nowrap">
+          {product.category_1_text}
+        </span>
+      )}
+    </div>
+
+    <p class="text-sm text-gray-600 line-clamp-2">
+      {product.shortDescription || 'Premium skin-care supplement.'}
+    </p>
+    <a
+      href={`/products/${product.id}`}
+      class="text-sm text-emerald-600 hover:underline font-medium"
+    >
+      View details →
+    </a>
+    <!-- CTA pushes itself to the bottom -->
+    <a
+      href={`https://wa.me/971501234567?text=${whatsappMessage(product)}`}
+      target="_blank"
+      rel="noopener"
+      class="btn-whatsapp mt-auto w-full justify-center"
+    >
+      Ask Price
+    </a>
+  </div>
+</article>
+
+<style>
+  /* keep equal-height cards in grid */
+  .card { display: flex; flex-direction: column; }
+</style>

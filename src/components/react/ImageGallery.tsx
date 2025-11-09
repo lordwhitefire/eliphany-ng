@@ -1,5 +1,6 @@
 // src/components/react/ImageGallery.tsx
 import type { FC } from 'react';
+import { useState } from 'react';
 
 interface Props {
   images: string[]; // 600w URLs

@@ -1,5 +1,6 @@
 // src/utils/filterByCategory.ts
 import type { Product } from '@/types'; // we’ll create this interface next
+import { slugify } from './slugify'; // ADD THIS LINE
 
 export function filterByCategory(list: Product[], categorySlug: string): Product[] {
   return list.filter(p => {

@@ -1,46 +1,82 @@
 ---
-import Layout from '../components/layouts/Layout.astro';
-import ProductCard from '../components/astro/ProductCard.astro';
-import CategoryPill from '../components/astro/CategoryPill.astro';
+import Layout from '../../components/layouts/Layout.astro';
+import ProductCard from '../../components/astro/ProductCard.astro';
+import CategoryPill from '../../components/astro/CategoryPill.astro';
 import { getUniqueCategories } from '@/utils/getUniqueCategories';
 import { filterByCategory } from '@/utils/filterByCategory';
 import products from '@/data/products.json';
 
+// Required for dynamic routes - generates /shop/1, /shop/2, etc.
+export async function getStaticPaths() {
+  const pageSize = 9;
+  const totalPages = Math.ceil(products.length / pageSize);
+  
+  const paths = [
+    // We'll handle page 1 separately with a redirect
+    ...Array.from({ length: totalPages }, (_, i) => i + 1)
+      .map(page => ({ 
+        params: { page: page.toString() } 
+      }))
+  ];
+  
+  console.log('Generated shop paths:', paths);
+  return paths;
+}
+
 const categories = await getUniqueCategories();
+const topCategories = categories.slice(0, 5);
+/* ---------- DEBUGGING ---------- */
+console.log('=== SHOP ROUTE DEBUG ===');
+console.log('Astro.params:', Astro.params);
+console.log('Astro.url:', Astro.url.href);
+
+// Handle page parameter - now it's just a string like "2"
+const pageParam = Astro.params.page;
+console.log('pageParam:', pageParam);
 
 /* ---------- filtering ---------- */
-const url = new URL(Astro.request.url);
-const activeCat = url.searchParams.get('cat') ?? 'All';
-
+const activeCat = Astro.url.searchParams.get('cat') ?? 'All';
 let list = activeCat === 'All' ? products : filterByCategory(products, activeCat);
 
 /* ---------- pagination ---------- */
 const pageSize = 9;
-const rawPage = Number(url.searchParams.get('page')) || 1;
-const currentPage = Math.max(1, Math.min(rawPage, Math.ceil(list.length / pageSize)));
 
+// Parse page number - much simpler now!
+const rawPage = pageParam ? Number(pageParam) : 1;
+const currentPage = Math.max(1, Math.min(rawPage, Math.ceil(list.length / pageSize)));
 const start = (currentPage - 1) * pageSize;
 const end = start + pageSize;
 const pageProducts = list.slice(start, end);
-
 const totalPages = Math.ceil(list.length / pageSize);
 
+console.log('currentPage:', currentPage);
+console.log('totalPages:', totalPages);
+console.log('Showing products:', start + 1, 'to', Math.min(end, list.length));
+
 /* ---------- SEO ---------- */
-const title = activeCat === 'All' ? 'All Products | Eliphany' : `${activeCat} | Eliphany`;
+const title = activeCat === 'All' ? `Page ${currentPage} - All Products | Eliphany` : `Page ${currentPage} - ${activeCat} | Eliphany`;
 const description = 'Browse skin-care supplements – contact us on WhatsApp for orders.';
 ---
 
 <Layout {title} {description}>
   <section class="py-12 px-4 max-w-7xl mx-auto">
-    <h1 class="text-4xl font-bold text-gray-900 mb-2">{activeCat}</h1>
+    <h1 class="text-4xl font-bold text-gray-900 mb-2">Shop - {activeCat}</h1>
     <p class="text-gray-600 mb-6">
       Showing {start + 1}–{Math.min(end, list.length)} of {list.length} results
+      (Page {currentPage})
     </p>
+
+    <!-- Debug info -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <p><strong>Route Debug:</strong></p>
+      <p>Page Parameter: <code>{pageParam || '1 (default)'}</code></p>
+      <p>Current Page: <strong>{currentPage}</strong></p>
+    </div>
 
     <!-- category filter -->
     <nav class="flex flex-wrap gap-2 mb-8 sticky top-20 bg-white/80 backdrop-blur z-10 py-3">
       <a
-        href="/products"
+        href="/shop/1"
         class:list={[
           'px-3 py-1.5 text-sm rounded-full border',
           activeCat === 'All'
@@ -50,11 +86,11 @@ const description = 'Browse skin-care supplements – contact us on WhatsApp for
       >
         All
       </a>
-      {categories.map(cat => (
+      {topCategories.map(cat => (
         <CategoryPill
           category={cat}
           large={false}
-          href={`/products?cat=${cat}`}
+          href={`/shop/1?cat=${encodeURIComponent(cat)}`}
         />
       ))}
     </nav>
@@ -68,7 +104,7 @@ const description = 'Browse skin-care supplements – contact us on WhatsApp for
     {totalPages > 1 && (
       <div class="flex items-center justify-between mt-10 text-sm">
         <a
-          href={`/products?cat=${activeCat}&page=${currentPage - 1}`}
+          href={currentPage === 2 ? '/shop/1' : `/shop/${currentPage - 1}?cat=${encodeURIComponent(activeCat)}`}
           class:list={[
             'px-4 py-2 rounded-lg border',
             currentPage === 1
@@ -85,7 +121,7 @@ const description = 'Browse skin-care supplements – contact us on WhatsApp for
         </span>
 
         <a
-          href={`/products?cat=${activeCat}&page=${currentPage + 1}`}
+          href={`/shop/${currentPage + 1}?cat=${encodeURIComponent(activeCat)}`}
           class:list={[
             'px-4 py-2 rounded-lg border',
             currentPage === totalPages

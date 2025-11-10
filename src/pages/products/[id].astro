@@ -1,26 +1,45 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from '../../components/layouts/Layout.astro';
 import BreadCrumb from '../../components/astro/BreadCrumb.astro';
 import { ImageGallery } from '../../components/react/ImageGallery';
 import { whatsappMessage } from '@/utils/whatsappMessage';
 import { slugify } from '@/utils/slugify';
 import products from '@/data/products.json';
-import { useState } from 'react';
-
 
 export async function getStaticPaths() {
   return products.map(p => ({ params: { id: p.id } }));
 }
 
 const { id } = Astro.params;
-const product = products.find(p => p.id === id)!;
+
+/* ---------- DEBUG PRODUCT DETAILS ---------- */
+console.log('=== PRODUCT DETAILS DEBUG ===');
+console.log('Requested ID:', id);
+console.log('All product IDs:', products.map(p => p.id));
+console.log('Found product:', products.find(p => p.id === id));
+
+const product = products.find(p => p.id === id);
+
+// Handle product not found
+if (!product) {
+  console.log('PRODUCT NOT FOUND!');
+  // You might want to redirect to 404 or show error
+  throw new Error(`Product with id ${id} not found`);
+}
 
 const title = `${product.name} | Eliphany`;
 const description = product.shortDescription || 'Premium skin-care supplement.';
 ---
 
-<Layout {title} {description} image={product.image.src}>
+<Layout {title} {description} image={product.image?.src}>
   <section class="py-8 px-4 max-w-6xl mx-auto">
+    <!-- Debug info -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <p><strong>Product Debug:</strong></p>
+      <p>Product ID: <code>{id}</code></p>
+      <p>Product Found: <code>{product ? 'Yes' : 'No'}</code></p>
+    </div>
+
     <BreadCrumb
       items={[
         { label: 'Home', href: '/' },

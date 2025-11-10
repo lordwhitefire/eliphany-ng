@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .petal { fill: #d1fae5; stroke: #10b981; stroke-width: 3; }
+    .drop { fill: #ffffff; filter: drop-shadow(0 0 8px #a7f3d0); }
+    .glow { fill: #6ee7b7; opacity: 0.6; }
+  </style>
+
+  <!-- Subtle glowing petal background -->
+  <ellipse cx="60" cy="70" rx="38" ry="48" class="petal"/>
+
+  <!-- Radiant dewdrop in the center -->
+  <circle cx="60" cy="48" r="14" class="drop"/>
+  <circle cx="60" cy="45" r="8" class="glow"/>
+
+  <!-- Tiny light spark -->
+  <circle cx="63" cy="42" r="3" fill="#ffffff"/>
+
+  <!-- Outer emerald ring (symbol of purity & luxury) -->
+  <circle cx="60" cy="60" r="56" fill="none" stroke="#10b981" stroke-width="1.5" opacity="0.3"/>
+</svg>

@@ -1,27 +1,44 @@
 ---
+// src/components/astro/Navbar.astro
 import CategoryPill from './CategoryPill.astro';
-
-/* fetch unique categories once at build time for the menu */
 import { getUniqueCategories } from '@/utils/getUniqueCategories';
 import { slugify } from '@/utils/slugify';
 
-const categories = await getUniqueCategories(); // string[]
+const categories = await getUniqueCategories();
+const topCategories = categories.slice(0, 5);
+
+const mainLinks = [
+  { name: 'Home', href: '/' },
+  { name: 'Products', href: '/shop/1' },
+  { name: 'About', href: '/about/' },
+  { name: 'Contact', href: '/contact/' },
+];
 ---
 
-<header class="sticky top-0 z-50 bg-white/90 backdrop-blur shadow-sm">
-  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Top">
-    <div class="w-full flex items-center justify-between h-16">
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Main navigation">
+    <div class="flex items-center justify-between h-16">
       <!-- Logo -->
-      <a href="/" class="flex items-center gap-2" aria-label="Home">
-        <img src="/logo.svg" alt="Eliphany" class="h-8 w-auto" />
-        <span class="font-bold text-emerald-600 hidden sm:inline">Eliphany</span>
+      <a href="/" class="flex items-center gap-2" aria-label="Eliphany Home">
+        <img src="/logo1.svg" alt="Eliphany" class="h-9 w-auto" />
+        <span class="font-bold text-emerald-600 hidden sm:inline text-xl">Eliphany</span>
       </a>
 
-      <!-- Desktop category pills -->
-      <div class="hidden md:flex items-center gap-2">
-        {categories.map(cat => (
-          <CategoryPill category={cat} />
-        ))}
+      <!-- Desktop: Main Links + Categories -->
+      <div class="hidden md:flex items-center gap-8">
+        <div class="flex gap-6">
+          {mainLinks.map(link => (
+            <a
+              href={link.href}
+              class="text-gray-700 hover:text-emerald-600 font-medium transition-colors"
+              aria-current={Astro.url.pathname === link.href ? 'page' : undefined}
+            >
+              {link.name}
+            </a>
+          ))}
+        </div>
+
+      
       </div>
 
       <!-- Mobile hamburger -->
@@ -30,6 +47,7 @@ const categories = await getUniqueCategories(); // string[]
         class="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100"
         aria-controls="mobile-menu"
         aria-expanded="false"
+        aria-label="Open menu"
       >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -38,12 +56,23 @@ const categories = await getUniqueCategories(); // string[]
     </div>
 
     <!-- Mobile menu -->
-    <div id="mobile-menu" class="md:hidden hidden pb-4">
-      <div class="flex flex-col gap-2">
-        {categories.map(cat => (
+    <div id="mobile-menu" class="md:hidden hidden pb-4 border-t border-gray-100 mt-2">
+      <div class="flex flex-col gap-1 py-2">
+        {mainLinks.map(link => (
+          <a
+            href={link.href}
+            class="px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-600"
+          >
+            {link.name}
+          </a>
+        ))}
+
+        {topCategories.length > 0 && <div class="border-t border-gray-200 my-2"></div>}
+
+        {topCategories.map(cat => (
           <a
             href={`/category/${slugify(cat)}`}
-            class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
+            class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-emerald-50 hover:text-emerald-700"
           >
             {cat}
           </a>
@@ -54,12 +83,32 @@ const categories = await getUniqueCategories(); // string[]
 </header>
 
 <script>
-  // toggle mobile menu
   const btn = document.getElementById('nav-toggle') as HTMLButtonElement;
-  const panel = document.getElementById('mobile-menu') as HTMLDivElement;
+  const menu = document.getElementById('mobile-menu') as HTMLDivElement;
+
   btn?.addEventListener('click', () => {
     const expanded = btn.getAttribute('aria-expanded') === 'true';
     btn.setAttribute('aria-expanded', String(!expanded));
-    panel.classList.toggle('hidden');
+    menu.classList.toggle('hidden');
+  });
+
+  document.querySelectorAll('#mobile-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      menu.classList.add('hidden');
+      btn.setAttribute('aria-expanded', 'false');
+    });
   });
 </script>
+
+<!-- THIS IS THE ONLY PART YOU CHANGE -->
+<style lang="postcss">
+  @import "tailwindcss";
+
+  a[aria-current="page"] {
+    @apply text-emerald-600 font-semibold relative;
+  }
+  a[aria-current="page"]::after {
+    content: '';
+    @apply absolute -bottom-1 left-0 w-full h-0.5 bg-emerald-600;
+  }
+</style>

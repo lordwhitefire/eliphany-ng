@@ -33,12 +33,7 @@ const description = product.shortDescription || 'Premium skin-care supplement.';
 
 <Layout {title} {description} image={product.image?.src}>
   <section class="py-8 px-4 max-w-6xl mx-auto">
-    <!-- Debug info -->
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-      <p><strong>Product Debug:</strong></p>
-      <p>Product ID: <code>{id}</code></p>
-      <p>Product Found: <code>{product ? 'Yes' : 'No'}</code></p>
-    </div>
+
 
     <BreadCrumb
       items={[

@@ -10,13 +10,31 @@ export interface Props {
   image?: string;
 }
 
-const { title, description = 'Skin-care supplements curated for you – contact us on WhatsApp.', image = '/social.jpg' } = Astro.props;
+const { title, description = 'Skin-care supplements curated for you – contact us on WhatsApp.', image = '/logo1.svg' } = Astro.props;
+
+// Set site URL for Open Graph tags
+const siteUrl = Astro.url.origin; // Will use localhost:4321 during dev, update for production
+const currentUrl = siteUrl + Astro.url.pathname;
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <BaseHead title={title} description={description} image={image} />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={`${siteUrl}${image}`} />
+    <meta property="og:url" content={currentUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Eliphany" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${siteUrl}${image}`} />
   </head>
 
   <body class="min-h-screen flex flex-col bg-gray-50 text-gray-800">

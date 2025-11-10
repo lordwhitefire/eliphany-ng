@@ -5,7 +5,7 @@ import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://eliphany-ng.vercel.ap', // your future domain (or use localhost for now)
+  site: 'https://eliphany-ng.vercel.app', // your future domain (or use localhost for now)
   vite: {
     plugins: [tailwindcss()]
   },

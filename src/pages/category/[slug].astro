@@ -4,21 +4,36 @@ import ProductCard from '../../components/astro/ProductCard.astro';
 import { getUniqueCategories } from '@/utils/getUniqueCategories';
 import { slugify } from '@/utils/slugify';
 import { filterByCategory } from '@/utils/filterByCategory';
-import products from '@/data/products.json';
+import { sanityClient, urlFor } from '@/lib/sanity';
 
-export  function getStaticPaths() {
-  const cats =  getUniqueCategories();
-  return cats.map(c => ({
-    params: { slug: slugify(c) },
-    props: { categoryName: c }
-  }));
+export async function getStaticPaths() {
+  const allProducts = await sanityClient.fetch(
+    `*[_type == "shopProduct"] { category }`
+  );
+  const cats = [...new Set(allProducts.map((p: any) => p.category))];
+  return cats.map(c => ({ params: { slug: slugify(c) }, props: { categoryName: c } }));
 }
 
 const { slug } = Astro.params;
 const { categoryName } = Astro.props;
-const list = filterByCategory(products, slug);
 
-// SEO
+const list = await sanityClient.fetch(
+  `*[_type == "shopProduct" && category == $cat] {
+     id, name, shortDescription, mainImage, category, tags, isNew
+   }`,
+  { cat: categoryName }
+).then((prods: any[]) =>
+  prods.map(p => ({
+    id: p.id,
+    name: p.name,
+    shortDescription: p.shortDescription,
+    image: { href: urlFor(p.mainImage).width(600).quality(80).url() },
+    category_1_text: p.category,
+    tags: p.tags || [],
+    isNew: p.isNew
+  }))
+);
+
 const title = `${categoryName} | Eliphany`;
 const description = `Shop ${categoryName} supplements – contact us on WhatsApp for instant orders.`;
 ---

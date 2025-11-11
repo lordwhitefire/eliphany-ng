@@ -2,58 +2,54 @@
 import Layout from '../../components/layouts/Layout.astro';
 import ProductCard from '../../components/astro/ProductCard.astro';
 import CategoryPill from '../../components/astro/CategoryPill.astro';
-import { getUniqueCategories } from '@/utils/getUniqueCategories';
-import { filterByCategory } from '@/utils/filterByCategory';
-import products from '@/data/products.json';
+import { sanityClient, urlFor } from '@/lib/sanity';
 
-// Required for dynamic routes - generates /shop/1, /shop/2, etc.
+// ---------- fetch unique categories ----------
+const catsRaw = await sanityClient.fetch(
+  `*[_type == "shopProduct"].category | order(@ asc)`
+);
+const categories = [...new Set(catsRaw)];
+const topCategories = categories.slice(0, 7);
+
+// ---------- dynamic routes ----------
 export async function getStaticPaths() {
   const pageSize = 9;
-  const totalPages = Math.ceil(products.length / pageSize);
-  
-  const paths = [
-    // We'll handle page 1 separately with a redirect
-    ...Array.from({ length: totalPages }, (_, i) => i + 1)
-      .map(page => ({ 
-        params: { page: page.toString() } 
-      }))
-  ];
-  
-  console.log('Generated shop paths:', paths);
-  return paths;
+  const allProducts = await sanityClient.fetch(
+    `*[_type == "shopProduct"] | order(_createdAt desc) { id }`
+  );
+  const totalPages = Math.ceil(allProducts.length / pageSize);
+  return Array.from({ length: totalPages }, (_, i) => i + 1)
+              .map(page => ({ params: { page: page.toString() } }));
 }
 
-const categories = await getUniqueCategories();
-const topCategories = categories.slice(0, 5);
-/* ---------- DEBUGGING ---------- */
-console.log('=== SHOP ROUTE DEBUG ===');
-console.log('Astro.params:', Astro.params);
-console.log('Astro.url:', Astro.url.href);
-
-// Handle page parameter - now it's just a string like "2"
 const pageParam = Astro.params.page;
-console.log('pageParam:', pageParam);
-
-/* ---------- filtering ---------- */
-const activeCat = Astro.url.searchParams.get('cat') ?? 'All';
-let list = activeCat === 'All' ? products : filterByCategory(products, activeCat);
-
-/* ---------- pagination ---------- */
-const pageSize = 9;
-
-// Parse page number - much simpler now!
 const rawPage = pageParam ? Number(pageParam) : 1;
+const activeCat = Astro.url.searchParams.get('cat') ?? 'All';
+
+// ---------- fetch products ----------
+const allProducts = await sanityClient.fetch(
+  `*[_type == "shopProduct"] | order(_createdAt desc) {
+     id, name, shortDescription, mainImage, category, tags, isNew
+  }`
+).then(list => list.map((p: any) => ({
+  id: p.id,
+  name: p.name,
+  shortDescription: p.shortDescription,
+  image: { href: urlFor(p.mainImage).width(600).quality(80).url() },
+  category_1_text: p.category,
+  tags: p.tags || [],
+  isNew: p.isNew
+})));
+
+let list = activeCat === 'All' ? allProducts : allProducts.filter(p => p.category_1_text === activeCat);
+
+const pageSize = 9;
 const currentPage = Math.max(1, Math.min(rawPage, Math.ceil(list.length / pageSize)));
 const start = (currentPage - 1) * pageSize;
 const end = start + pageSize;
 const pageProducts = list.slice(start, end);
 const totalPages = Math.ceil(list.length / pageSize);
 
-console.log('currentPage:', currentPage);
-console.log('totalPages:', totalPages);
-console.log('Showing products:', start + 1, 'to', Math.min(end, list.length));
-
-/* ---------- SEO ---------- */
 const title = activeCat === 'All' ? `Page ${currentPage} - All Products | Eliphany` : `Page ${currentPage} - ${activeCat} | Eliphany`;
 const description = 'Browse skin-care supplements – contact us on WhatsApp for orders.';
 ---
@@ -65,8 +61,6 @@ const description = 'Browse skin-care supplements – contact us on WhatsApp for
       Showing {start + 1}–{Math.min(end, list.length)} of {list.length} results
       (Page {currentPage})
     </p>
-
-
 
     <!-- category filter -->
     <nav class="flex flex-wrap gap-2 mb-8 sticky top-20 bg-white/80 backdrop-blur z-10 py-3">
